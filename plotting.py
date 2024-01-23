@@ -19,10 +19,10 @@ def plot_loss(scores):
     plt.xlabel('# epochs')
     plt.ylabel('loss')
 
-clr1 = np.array([198, 57, 255])/255
-clr2 = np.array([0, 137, 64])/255
-clr3 = np.array([242, 90, 41])/255
-clr4 = np.array([84, 170, 255])/255
+clr1 = np.array([198, 57, 255])/255     #purple
+clr2 = np.array([0, 137, 64])/255       #green
+clr3 = np.array([242, 90, 41])/255      #orange
+clr4 = np.array([84, 170, 255])/255     #blue
 COLORS = [clr1, clr2, clr3, clr4]
 
 def plot_trials(trials):
@@ -48,7 +48,7 @@ def plot_predictions(responses, key='value', gamma=1.0):
     if key == 'value':
         discount = lambda rs_future: np.sum([r * gamma ** (tau+1) if ~np.isnan(r) else 0.0 for tau,r in enumerate(rs_future)])
     
-    plt.figure(figsize=(2,4))
+    plt.figure(figsize=(5,3))
     ymax = 0.85 # for spacing in plots
     tstep = max([trial[key].max()-trial[key].min() for trial in responses]) # for spacing in plots
     for t, trial in enumerate(responses):
@@ -63,28 +63,28 @@ def plot_predictions(responses, key='value', gamma=1.0):
         y = trial[key]
         clr = clrs[trial['cue']]
         
-        # plot zero line
+        # plot zero line (black, semi-transparent)
         plt.plot(xs, -t*tstep + np.zeros(len(xs)), 'k-', alpha=0.25)
         
-        # plot stim
-        plt.plot(t_stim*np.ones(2), [-t*tstep, -t*tstep + tstep*ymax], '-', color=clr)
+        # plot stimulus (blue, semi-transparent)
+        plt.plot(t_stim*np.ones(2), [-t*tstep, -t*tstep + tstep*ymax], '-', color='b', label='stim', alpha=0.5)
         
-        # plot reward
+        # plot reward (green, semi-transparent)
         if t_rew is not None:
-            plt.plot(t_rew*np.ones(2), [-t*tstep, -t*tstep + tstep*ymax], 'k-', alpha=0.25)
+            plt.plot(t_rew*np.ones(2), [-t*tstep, -t*tstep + tstep*ymax], '-', alpha=0.5, label='rew', color='green')
 
-        # plot prediction
-        plt.plot(xs[:len(y)], 0.95*ymax*y - t*tstep, '.-', color=clr)
+        # plot prediction (purple, dots-and-dashes)
+        plt.plot(xs[:len(y)], 0.95*ymax*y - t*tstep, '.-', color=clr, label='pred')
 
         if key == 'value':
-            # plot true value
+            # plot true value (black, dotted)
             R = np.array([r + discount(rs[(i+1):]) for i,r in enumerate(rs)])
             plt.plot(xs[:-1], tstep*ymax*R[1:] - t*tstep, 'k--', alpha=0.9)
     
     plt.xlabel('time $\\rightarrow$')
     plt.ylabel(key)
-    plt.yticks(ticks=[], labels=[])
-    plt.gca().spines.get('left').set_visible(False)
+    plt.yticks()
+    plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0., fontsize=8)
     plt.show()
 
 def plot_hidden_activity(responses, key='Z', align_offset=1):
@@ -104,6 +104,7 @@ def plot_hidden_activity(responses, key='Z', align_offset=1):
         if t_rew is not None:
             plt.plot(Z[t_rew,0], Z[t_rew,1], '*', color=clr, markersize=5)
         # plt.plot(Z[trial.iti+1+align_offset,0], Z[trial.iti+1+align_offset,1], '*', markersize=6, color=h.get_color())
+    plt.figure(figsize=(9,4))
     plt.plot(0, 0, 'k+')
     plt.xlabel('$z_1$')
     plt.ylabel('$z_2$')
