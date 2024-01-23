@@ -15,6 +15,7 @@ mpl.rcParams['axes.spines.right'] = False
 mpl.rcParams['axes.spines.top'] = False
 
 def plot_loss(scores):
+    plt.figure(figsize=(7,4))
     plt.plot(scores)
     plt.xlabel('# epochs')
     plt.ylabel('loss')
@@ -29,7 +30,7 @@ def plot_trials(trials):
     clrs = COLORS[:(trials[0].shape[1]-1)]
     clrs += ['k']
     
-    plt.figure(figsize=(2,4))
+    plt.figure(figsize=(2,2))
     ymax = 0.8
     for t in range(len(trials)):
         for c in range(trials[t].shape[1]):
@@ -90,6 +91,7 @@ def plot_predictions(responses, key='value', gamma=1.0):
 def plot_hidden_activity(responses, key='Z', align_offset=1):
     clrs = COLORS[:responses[0]['X'].shape[1]]
     msz = 5
+    plt.figure(figsize=(9,4))
     for trial in responses:
         t_stim = trial['iti']
         if trial['isi'] is not None:
@@ -104,7 +106,6 @@ def plot_hidden_activity(responses, key='Z', align_offset=1):
         if t_rew is not None:
             plt.plot(Z[t_rew,0], Z[t_rew,1], '*', color=clr, markersize=5)
         # plt.plot(Z[trial.iti+1+align_offset,0], Z[trial.iti+1+align_offset,1], '*', markersize=6, color=h.get_color())
-    plt.figure(figsize=(9,4))
     plt.plot(0, 0, 'k+')
     plt.xlabel('$z_1$')
     plt.ylabel('$z_2$')
