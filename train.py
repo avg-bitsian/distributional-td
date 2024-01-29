@@ -12,6 +12,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence
 
+alpha_plus = 0.03   #learning rate for positive errors
+alpha_minus = 0.07  #learning rate for negative errors
+
 def pad_collate(batch):
     (xx, yy) = zip(*batch)
     x_lens = [len(x) for x in xx]
@@ -50,15 +53,19 @@ def train_epoch(model, dataloader, loss_fn, optimizer=None, handle_padding=True)
         V_next = V[1:,:,:]
         V_target = y[1:,:,:] + model.gamma*V_next.detach()
 
+        alpha = alpha_plus*(V_target > V_hat) + alpha_minus*(V_target <= V_hat)    # [T x batch_size x N]
+        V_hat_2 = torch.sqrt(alpha)*V_hat
+        V_target_2 = torch.sqrt(alpha)*V_target
+
         if handle_padding:
             # do not compute loss on padded values
             loss = 0.0
             for i,l in enumerate(x_lengths):
                 # we must stop one short because V_target is one step ahead
-                loss += loss_fn(V_hat[:,i][:(l-1)], V_target[:,i][:(l-1)])
+                loss += loss_fn(V_hat_2[:,i][:(l-1)], V_target_2[:,i][:(l-1)])
             loss /= sum(x_lengths) # when reduction='sum', this makes loss the mean per time step
         else:
-            loss = loss_fn(V_hat, V_target)
+            loss = loss_fn(V_hat_2, V_target_2)
 
         # Backpropagation
         if optimizer is not None:
@@ -126,7 +133,13 @@ def probe_model(model, dataloader):
             V_next = V[1:,:]
             r = y[1:,:]
             V_target = r + model.gamma*V_next
-            rpe = V_target - V_hat
+            # rpe = V_target - V_hat
+
+            alpha = alpha_plus*(V_target > V_hat) + alpha_minus*(V_target <= V_hat)    # [T x batch_size x N]
+            V_hat_2 = np.sqrt(alpha)*V_hat
+            V_target_2 = np.sqrt(alpha)*V_target
+
+            rpe = V_target_2 - V_hat_2
             
             # recover trial info
             cue = np.where(X[:,:-1].sum(axis=0))[0][0]
