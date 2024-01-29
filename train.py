@@ -81,7 +81,7 @@ def train_epoch(model, dataloader, loss_fn, optimizer=None, handle_padding=True)
 
 def train_model(model, dataloader, lr, nchances=4, epochs=5000, handle_padding=True, print_every=10):
     loss_fn = nn.MSELoss(reduction='sum')
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
+    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
     
     scores = np.nan * np.ones((epochs+1,))
     scores[0] = train_epoch(model, dataloader, loss_fn, None, handle_padding)
