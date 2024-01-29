@@ -12,8 +12,8 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.nn.utils.rnn import pad_sequence, pack_padded_sequence
 
-alpha_plus = 0.5   #learning rate for positive errors
-alpha_minus = 0.5  #learning rate for negative errors
+alpha_plus = 0.05   #learning rate for positive errors
+alpha_minus = 0.05  #learning rate for negative errors
 
 def pad_collate(batch):
     (xx, yy) = zip(*batch)
