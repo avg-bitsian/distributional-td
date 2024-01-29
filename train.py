@@ -96,13 +96,13 @@ def train_model(model, dataloader, lr, nchances=4, epochs=5000, handle_padding=T
             if scores[t+1] < best_score:
                 best_score = scores[t+1]
                 best_weights = deepcopy(model.state_dict())
-            if scores[t+1] > scores[t]:
-                if nsteps_increase > nchances:
-                    print("Stopping.")
-                    break
-                nsteps_increase += 1
-            else:
-                nsteps_increase = 0
+            # if scores[t+1] > scores[t]:
+            #     if nsteps_increase > nchances:
+            #         print("Stopping.")
+            #         break
+            #     nsteps_increase += 1
+            # else:
+            #     nsteps_increase = 0
     except KeyboardInterrupt:
         pass
     finally:
